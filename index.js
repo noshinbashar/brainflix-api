@@ -2,14 +2,16 @@ const express = require("express");
 const app = express();
 const videos = require("./routes/videos");
 const cors = require("cors");
+// require('dotenv').config();
 
 const PORT = 8080;
 
-app.use(express.json()); // sets the req.body
-app.use(express.static("public")); // make resources from the "public" folder available from the client
+app.use(express.json()); 
+app.use(express.static("public")); 
 app.use(cors());
 
 app.use("/videos", videos);
+
 
 app.get("/", (req, res) => {
     res.send("Welcome to the dungeon!");
