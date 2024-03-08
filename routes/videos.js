@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs");
-// const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
 
 router.get("/", (req, res) => {
@@ -12,10 +12,9 @@ router.get("/", (req, res) => {
 });
 
 
-
+  // Get selected video by ID
 router.get("/:videosId", (req, res) => {
 
-  // Get selected video by ID
   const { videosId } = req.params;
   console.log("params: ", videosId);
 
@@ -31,8 +30,7 @@ router.get("/:videosId", (req, res) => {
 });
 
 
-
-// Get comments for a specific video by ID
+// Get comments for a selected video
 router.get("/:id/comments", (req, res) => {
   const videoId = req.params.id;
 
@@ -53,27 +51,33 @@ router.get("/:id/comments", (req, res) => {
 });
 
 
-// Get a single comment for a specific video by ID
-router.get("/:videoId/comments/:commentId", (req, res) => {
+// Post a new comment for selected video
+router.post("/:videoId/comments", (req, res) => {
   const videoId = req.params.videoId;
-  const commentId = req.params.commentId;
 
   // Read video data from JSON file
   const videosJSON = fs.readFileSync("./data/videos.json");
   const videos = JSON.parse(videosJSON);
 
   // Find the video by ID
-  const video = videos.find(video => video.id === videoId);
+  const videoIndex = videos.findIndex(video => video.id === videoId);
 
-  // If video is found, find the comment by its ID
-  if (video) {
-    const comment = video.comments.find(comment => comment.id === commentId);
-    if (comment) {
-      res.status(200).json(comment);
-    } else {
-      // If comment is not found, send 404 error
-      res.status(404).json({ error: "Comment not found" });
-    }
+  // If video is found, create a new comment
+  if (videoIndex !== -1) {
+    const newComment = {
+      id: uuidv4(),
+      name: req.body.name, 
+      comment: req.body.comment, 
+      likes: 0,
+      timestamp: Date.now()
+    };
+    
+    videos[videoIndex].comments.push(newComment);
+
+    // Write updated video data back to JSON file
+    fs.writeFileSync("./data/videos.json", JSON.stringify(videos));
+
+    res.status(201).json(newComment);
   } else {
     // If video is not found, send 404 error
     res.status(404).json({ error: "Video not found" });
