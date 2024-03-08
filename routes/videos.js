@@ -14,10 +14,12 @@ router.get("/", (req, res) => {
 
 
 router.get("/:videosId", (req, res) => {
- 
+
+  // Get selected video by ID
   const { videosId } = req.params;
   console.log("params: ", videosId);
 
+  // Read video data from JSON file
   const videosJSON = fs.readFileSync("./data/videos.json");
   const videos = JSON.parse(videosJSON);
 
@@ -47,6 +49,34 @@ router.get("/:id/comments", (req, res) => {
   } else {
       // If video is not found, send 404 error
       res.status(404).json({ error: "Video not found" });
+  }
+});
+
+
+// Get a single comment for a specific video by ID
+router.get("/:videoId/comments/:commentId", (req, res) => {
+  const videoId = req.params.videoId;
+  const commentId = req.params.commentId;
+
+  // Read video data from JSON file
+  const videosJSON = fs.readFileSync("./data/videos.json");
+  const videos = JSON.parse(videosJSON);
+
+  // Find the video by ID
+  const video = videos.find(video => video.id === videoId);
+
+  // If video is found, find the comment by its ID
+  if (video) {
+    const comment = video.comments.find(comment => comment.id === commentId);
+    if (comment) {
+      res.status(200).json(comment);
+    } else {
+      // If comment is not found, send 404 error
+      res.status(404).json({ error: "Comment not found" });
+    }
+  } else {
+    // If video is not found, send 404 error
+    res.status(404).json({ error: "Video not found" });
   }
 });
 
