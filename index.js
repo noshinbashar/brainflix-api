@@ -14,7 +14,7 @@ app.use("/videos", videos);
 
 
 app.get("/", (req, res) => {
-    res.send("Welcome to the dungeon!");
+    res.send("Welcome!");
   });
   
   app.listen(PORT, () => {

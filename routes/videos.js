@@ -84,4 +84,32 @@ router.post("/:videoId/comments", (req, res) => {
   }
 });
 
+
+// Delete a comment for selected video
+router.delete("/:videoId/comments/:commentId", (req, res) => {
+  const videoId = req.params.videoId;
+  const commentId = req.params.commentId;
+
+  // Read video data from JSON file
+  const videosJSON = fs.readFileSync("./data/videos.json");
+  let videos = JSON.parse(videosJSON);
+
+  // Find the video by ID
+  const videoIndex = videos.findIndex(video => video.id === videoId);
+
+  // If video is found, find the comment by its ID and delete it
+  if (videoIndex !== -1) {
+    const commentIndex = videos[videoIndex].comments.findIndex(comment => comment.id === commentId);
+    if (commentIndex !== -1) {
+      videos[videoIndex].comments.splice(commentIndex, 1);
+      
+      // Write updated video data back to JSON file
+      fs.writeFileSync("./data/videos.json", JSON.stringify(videos));
+
+      res.status(204).send(); // No content
+    } 
+  } 
+
+});
+
 module.exports = router;
