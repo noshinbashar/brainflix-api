@@ -14,7 +14,7 @@ app.use("/videos", videos);
 
 
 app.get("/", (req, res) => {
-    res.send("Welcome!");
+    res.send("Welcome to the server!");
   });
   
   app.listen(PORT, () => {
