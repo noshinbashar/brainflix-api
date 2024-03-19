@@ -112,4 +112,45 @@ router.delete("/:videoId/comments/:commentId", (req, res) => {
 
 });
 
+//---------------------------------------------------------------------------------------------------------//
+
+const randomName = uniqueNamesGenerator({ 
+  dictionaries: [adjectives, names],
+  separator: ' ',
+  style: 'capital', 
+});
+
+let randomImg = images[Math.floor(Math.random() * images.length)];
+
+router.post('/videos', (req, res) => {
+  const { title, description } = req.body;
+  if (!title || !description) {
+    return res.status(400).send('Title and description are required fields');
+  }
+
+  const newVideo = {
+    title,
+    channel: randomName, 
+    image: randomImg,
+    description,
+    views: "0",
+    likes: "0",
+    duration: `${Math.floor(Math.random() * 60)}:${Math.floor(Math.random() * 60)+1}`,
+    timestamp: Date.now(),
+    comments: [],
+    id: uuidv4(),
+  };
+
+  videos.push(newVideo);
+
+  // Write updated video data back to JSON file
+  fs.writeFileSync("./data/videos.json", JSON.stringify(videos));
+
+  res.status(201).json(newVideo);
+});
+
+
+// DELETE request for /video/:videoId
+
+
 module.exports = router;
