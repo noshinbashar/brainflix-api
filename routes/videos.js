@@ -2,6 +2,19 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
+const { uniqueNamesGenerator, names, adjectives } = require('unique-names-generator');
+const multer = require('multer');
+// const upload = multer({ dest: "./data/videos.json" });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 
 router.get("/", (req, res) => {
@@ -120,22 +133,22 @@ const randomName = uniqueNamesGenerator({
   style: 'capital', 
 });
 
-let randomImg = images[Math.floor(Math.random() * images.length)];
-
-router.post('/videos', (req, res) => {
+router.post('/videos', upload.single('image'), (req, res) => {
   const { title, description } = req.body;
+  const image = req.file ? req.file.path : ''; // Retrieve the path of the uploaded image
+
   if (!title || !description) {
     return res.status(400).send('Title and description are required fields');
   }
 
   const newVideo = {
     title,
-    channel: randomName, 
-    image: randomImg,
+    channel: randomName,
+    image,
     description,
     views: "0",
     likes: "0",
-    duration: `${Math.floor(Math.random() * 60)}:${Math.floor(Math.random() * 60)+1}`,
+    duration: `${Math.floor(Math.random() * 60)}:${Math.floor(Math.random() * 60) + 1}`,
     timestamp: Date.now(),
     comments: [],
     id: uuidv4(),
@@ -148,7 +161,6 @@ router.post('/videos', (req, res) => {
 
   res.status(201).json(newVideo);
 });
-
 
 // DELETE request for /video/:videoId
 
